@@ -1,3 +1,4 @@
+import { loadTasks, saveTasks, generateId } from './tasks.js';
 /* eslint-env browser */
 /* global document, window, localStorage */
 
@@ -16,30 +17,6 @@
 'use strict';
 
 (function () {
-  // Storage key and helpers
-  const STORAGE_KEY = 'todo_tasks_v1';
-  /** @returns {Array} */
-  function loadTasks() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-  function saveTasks(tasks) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-  }
-  function generateId() {
-    return (
-      't_' +
-      Math.random().toString(36).slice(2, 8) +
-      Date.now().toString(36).slice(-4)
-    );
-  }
-
   // DOM refs
   const form = /** @type {HTMLFormElement} */ (
     document.getElementById('task-form')
