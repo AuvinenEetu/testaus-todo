@@ -136,4 +136,36 @@ describe('Todo app', () => {
       expect(tasks).to.have.length(0);
     });
   });
+  it('tests the priority filtering feature and verifies all the options work', () => {
+    // create three tasks
+    // first task
+    cy.get('#topic').type('Poistettava taski');
+    cy.get('#description').type('Tämä poistetaan');
+    cy.get('#priority').select('High');
+    cy.get('#save-btn').click();
+    // second task
+    cy.get('#topic').type('Poistettava taski numero 2');
+    cy.get('#description').type('Tämä poistetaan myös');
+    cy.get('#priority').select('Low');
+    cy.get('#save-btn').click();
+    // third task
+    cy.get('#topic').type('Poistettava taski numero 3');
+    cy.get('#description').type('Tämä poistetaan myös');
+    cy.get('#priority').select('Medium');
+    cy.get('#save-btn').click();
+    // Verify tasks were created
+    cy.get('#task-list .task').should('have.length', 3);
+    // select priority high and verify that only 1 task is showing
+    cy.get('.high').click();
+    cy.get('#task-list .task').should('have.length', 1);
+    // select priority low and verify that only 1 task is showing
+    cy.get('.low').click();
+    cy.get('#task-list .task').should('have.length', 1);
+    // select priority medium and verify that only 1 task is showing
+    cy.get('.medium').click();
+    cy.get('#task-list .task').should('have.length', 1);
+    // select All priorities and verify all tasks are showing
+    cy.get('.all').click();
+    cy.get('#task-list .task').should('have.length', 3);
+  });
 });

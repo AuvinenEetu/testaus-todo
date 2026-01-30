@@ -129,6 +129,9 @@ button:disabled {
   padding: 2px 8px;
   border-radius: 999px;
 }
+.pill.all {
+  color: black
+}
 .pill.low {
   color: #2b8a6e;
 }

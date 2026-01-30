@@ -14,7 +14,7 @@ import { loadTasks, saveTasks, generateId } from './tasks.js';
  * @property {number} updatedAt
  */
 
-'use strict';
+('use strict');
 
 (function () {
   // DOM refs
@@ -51,20 +51,44 @@ import { loadTasks, saveTasks, generateId } from './tasks.js';
   const emptyState = /** @type {HTMLElement} */ (
     document.getElementById('empty-state')
   );
+  const filterLegend = /** @type {HTMLElement} */ (
+    document.querySelector('.legend')
+  );
 
   // State
   let tasks = loadTasks();
+  let currentFilter = 'all';
 
   // Render
   function render() {
     list.innerHTML = '';
-    if (!tasks.length) {
-      emptyState.style.display = 'block';
+
+    const pills = filterLegend.querySelectorAll('.pill');
+    pills.forEach((pill) => {
+      const p = /** @type {HTMLElement} */ (pill);
+      const isActive = p.dataset.priority === currentFilter;
+      p.style.opacity = isActive ? '1' : '0.4';
+      p.style.transform = isActive ? 'scale(1.1)' : 'scale(1)';
+      p.style.fontWeight = isActive ? 'bold' : 'normal';
+    });
+
+    const filteredTasks = tasks.filter((t) =>
+      currentFilter === 'all' ? true : t.priority === currentFilter,
+    );
+
+    if (!filteredTasks.length) {
+      if (tasks.length === 0) {
+        emptyState.style.display = 'block';
+        emptyState.textContent = 'No tasks yet. Add your first task above.';
+      } else {
+        emptyState.style.display = 'block';
+        emptyState.textContent = 'No tasks found with this priority.';
+      }
       return;
     }
     emptyState.style.display = 'none';
 
-    tasks
+    filteredTasks
       .sort((a, b) => {
         // Not-done first, then by priority (high->low), then newest first
         if (a.completed !== b.completed) return a.completed ? 1 : -1;
@@ -209,8 +233,8 @@ import { loadTasks, saveTasks, generateId } from './tasks.js';
         status: nextCompleted
           ? 'done'
           : t.status === 'done'
-          ? 'todo'
-          : t.status,
+            ? 'todo'
+            : t.status,
         updatedAt: Date.now(),
       };
       saveTasks(tasks);
@@ -219,8 +243,20 @@ import { loadTasks, saveTasks, generateId } from './tasks.js';
     if (action === 'delete') {
       const confirmDelete = window.confirm('Delete this task?');
       if (!confirmDelete) return;
+
       tasks.splice(idx, 1);
       saveTasks(tasks);
+      render();
+    }
+  });
+
+  filterLegend.addEventListener('click', (e) => {
+    const target = /** @type {HTMLElement} */ (e.target).closest('.pill');
+    if (!target) return;
+
+    const priority = target.dataset.priority;
+    if (priority) {
+      currentFilter = priority;
       render();
     }
   });
